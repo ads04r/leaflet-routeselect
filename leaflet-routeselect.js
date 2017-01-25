@@ -23,14 +23,16 @@ L.Control.RouteSelect = L.Control.extend(
 		{
 			var item = this.options.routes[i];
 			var node = L.DomUtil.create('div', '', ctrl);
-			node.setAttribute('style', 'clear: both; border-radius: 5px; min-width: 60px; padding: 5px; margin: 5px; float: left; color: ' + item.text + ' ; background-color: ' + item.colour);
+			node.setAttribute('style', 'clear: both; min-width: 60px; padding-left: 5px; padding-right: 5px; float: left;');
 			var nodeinput = L.DomUtil.create('input', '', node);
 			nodeinput.setAttribute('type', 'checkbox');
 			nodeinput.setAttribute('checked', 'checked');
 			nodeinput.setAttribute('id', 'route_click_cb' + i);
 			var nodelabel = L.DomUtil.create('label', '', node);
 			nodelabel.setAttribute('for', 'route_click_cb' + i);
+			nodelabel.setAttribute('style', item.style);
 			nodelabel.innerHTML = '&nbsp;' + item.name;
+			this.options.routes[i].control = nodeinput;
 
 			var parent = this;
 			L.DomEvent.addListener(nodeinput, 'change', function()
@@ -48,7 +50,18 @@ L.Control.RouteSelect = L.Control.extend(
 			} );
 		}
 	},
-	addRoute: function(name, colour, text, layer)
+	serialize: function()
+	{
+		var l = Math.pow(2, (this.options.routes.length - 1));
+		var t = 0;
+		for(var i = 0; i < this.options.routes.length; i++)
+		{
+			if(this.options.routes[i].control.checked) { t = t + l; }
+			l = l / 2;
+		}
+		return t;
+	},
+	addRoute: function(name, layer, style)
 	{
 		for(var i = 0; i < this.options.routes.length; i++)
 		{
@@ -59,8 +72,7 @@ L.Control.RouteSelect = L.Control.extend(
 
 		var item = {};
 		item['name'] = name;
-		item['colour'] = colour;
-		item['text'] = text;
+		item['style'] = style;
 		item['layers'] = [];
 		item['layers'].push(layer);
 		this.options.routes.push(item);
